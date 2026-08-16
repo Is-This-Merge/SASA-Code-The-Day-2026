@@ -1,0 +1,6 @@
+{
+  "name": "Moments - Visual Story Journal",
+  "description": "An aesthetic visual journaling app for capturing everyday moments, photographic stories, reflections, and archives.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
