@@ -1,17 +1,144 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moments — Visual Story Journal</title>
-    <meta name="description" content="An aesthetic visual journaling app for capturing everyday moments, photographic stories, reflections, and archives." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f7fafc" />
+    <meta
+      name="description"
+      content="SASA가 주최하는 2026 정보과학의 날, Code The Day 부스 및 운영 안내"
+    />
+    <title>Code The Day 2026 | SASA 정보과학의 날</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="bg-[#F8F6F0] text-[#2C2825] antialiased selection:bg-[#E8D9C9] selection:text-[#883824]">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body>
+    <main>
+      <section class="hero" id="home">
+        <div class="grid-bg" aria-hidden="true"></div>
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="system-status" aria-hidden="true">
+          <span>SASA</span><span>09.18.2026</span><span>SYSTEM: OPEN</span>
+        </div>
+        <div class="hero-copy">
+          <h1>
+            <span>Welcome to</span><em>Code The Day<i>.</i></em>
+          </h1>
+          <p class="lead">
+            오늘, 미래를 실행하세요.<br />네 정보과학 동아리가 준비한 다양한
+            체험이 기다립니다.
+          </p>
+        </div>
+
+        <figure
+          class="hero-mascot"
+          aria-label="클릭하면 간지럼을 타는 SASA 마스코트 구름이"
+        >
+          <div class="mascot-orbit" aria-hidden="true"></div>
+          <img
+            src="assets/sasa-mascot-wave.png"
+            alt="손을 흔드는 SASA 마스코트"
+          />
+        </figure>
+
+        <div class="carousel" aria-label="추천 부스">
+          <div class="carousel-head">
+            <span>WHERE TO GO?</span><span id="slide-count">01 / 15</span>
+          </div>
+          <div class="slides" id="slides"></div>
+          <div class="carousel-controls">
+            <button id="prev" type="button" aria-label="이전 부스">←</button>
+            <div class="progress"><i id="progress"></i></div>
+            <button id="next" type="button" aria-label="다음 부스">→</button>
+          </div>
+        </div>
+        <a class="scroll-cue" href="#booths"><span>전체 부스 보기</span>↓</a>
+      </section>
+
+      <section class="booths section" id="booths">
+        <div class="section-title">
+          <h2>어디로 갈까?</h2>
+        </div>
+        <span class="selection-secret" aria-label="숨겨진 정보과학의 날 문구"
+          >정보과학의 날</span
+        >
+        <div class="filters" id="filters" aria-label="장소 필터">
+          <button class="active" data-place="전체">전체 14</button
+          ><button data-place="1층 로비">1층 로비</button
+          ><button data-place="2층 로비">2층 로비</button
+          ><button data-place="S108">S108</button
+          ><button data-place="S109">S109</button
+          ><button data-place="8-puzzle">8-puzzle</button>
+        </div>
+        <div class="booth-grid" id="booth-grid"></div>
+      </section>
+
+      <section class="guide" id="guide" aria-label="행사 운영 정보">
+        <div class="guide-grid">
+          <article>
+            <small>교내 학생</small><strong>16:20 — 18:10</strong>
+            <p>8·9교시 운영</p>
+          </article>
+          <article>
+            <small>교외 학생</small><strong>19:00 — 20:50</strong>
+            <p>1자 운영</p>
+          </article>
+          <article>
+            <small>운영 장소</small><strong>1·2층 로비</strong>
+            <p>S108 · S109 포함</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <section class="mascot-playground" aria-label="구름이 휴게 공간">
+      <figure
+        class="draggable-mascot"
+        tabindex="0"
+        role="button"
+        aria-label="움직일 수 있는 구름이. 오른쪽 도킹 지점으로 옮기세요"
+      >
+        <img
+          src="assets/sasa-mascot-worried.png"
+          alt="길을 잃은 SASA 마스코트 구름이"
+          draggable="false"
+        />
+      </figure>
+      <div class="mascot-dock" id="mascot-dock" aria-hidden="true"></div>
+    </section>
+
+    <footer>
+      <div class="footer-code" aria-label="Code The Day 문구 완성하기">
+        <label
+          >C<input
+            data-ctd-part="ode"
+            maxlength="3"
+            autocomplete="off"
+            aria-label="C 다음 글자 입력"
+        /></label>
+        <label
+          >T<input
+            data-ctd-part="he"
+            maxlength="2"
+            autocomplete="off"
+            aria-label="T 다음 글자 입력"
+        /></label>
+        <label
+          >D<input
+            data-ctd-part="ay"
+            maxlength="2"
+            autocomplete="off"
+            aria-label="D 다음 글자 입력"
+        /></label>
+      </div>
+      <small>2026. 09. 18.</small>
+    </footer>
+
+    <div class="egg-toast" role="status" aria-live="polite"></div>
+
+    <dialog id="booth-dialog">
+      <button class="dialog-close" type="button" aria-label="닫기">×</button>
+      <div id="dialog-content"></div>
+    </dialog>
+    <script src="script.js"></script>
   </body>
 </html>
-
