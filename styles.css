@@ -18,7 +18,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "DM Sans", "Noto Sans KR", sans-serif;
+  font-family: "DM Sans", "Noto Sans KR", "Malgun Gothic", sans-serif;
   color-scheme: light;
 }
 button,
@@ -59,6 +59,7 @@ button {
 }
 .hero-copy {
   z-index: 3;
+  font-family: "Noto Sans KR", "Malgun Gothic", "DM Sans", sans-serif;
 }
 .eyebrow {
   display: flex;
@@ -284,10 +285,25 @@ button {
   box-shadow: 0 6px 20px rgba(0, 127, 114, 0.2);
 }
 .booth-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
+}
+.booth-grid.mining-board {
+  background:
+    linear-gradient(rgba(7, 37, 50, 0.05), rgba(7, 37, 50, 0.05)),
+    url("assets/minecraft/voxel-mascot-reveal.png") center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(0, 127, 114, 0.22);
+}
+.booth-grid.mining-board .booth-card {
+  background: #ffffff;
+}
+.booth-grid.image-revealed {
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 127, 114, 0.3),
+    0 24px 70px rgba(24, 84, 110, 0.18);
 }
 .booth-card {
   --accent: #007f72;
@@ -302,11 +318,14 @@ button {
   flex-direction: column;
   transition: 0.3s;
 }
-.booth-card:hover {
+.booth-card:not([data-open="7"]):hover {
   background: color-mix(in srgb, var(--accent) 16%, var(--surface));
   transform: translateY(-5px);
   box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 14%, transparent);
   border-color: var(--accent);
+}
+.booth-card[data-open="7"] {
+  cursor: crosshair;
 }
 .booth-card > span {
   font-size: 15px;
@@ -381,8 +400,9 @@ footer {
   color: var(--ink);
   border-top: 1px solid var(--line);
   padding: 45px 5vw;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px 32px;
   align-items: center;
 }
 footer p {
@@ -390,6 +410,16 @@ footer p {
 }
 footer small {
   color: var(--muted);
+}
+footer .egg-count {
+  grid-column: 1 / -1;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  color: var(--orange);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
 }
 dialog {
   width: min(670px, calc(100% - 32px));
@@ -457,7 +487,8 @@ dd {
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  font-family: monospace;
+  font-family: "DM Sans", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.12em;
 }
@@ -578,70 +609,117 @@ dd {
   font-size: 16px;
   user-select: text;
 }
-.anomaly-card,
-.anomaly-slide {
+.easter-egg-slide {
+  cursor: pointer;
+  overflow: hidden;
+}
+.easter-egg-slide.glitching {
+  box-shadow:
+    -8px 0 0 rgba(0, 110, 230, 0.18),
+    8px 0 0 rgba(196, 60, 162, 0.16),
+    0 20px 60px rgba(39, 72, 98, 0.16);
+  animation: glitch-signal 0.16s steps(2) 7;
+}
+.easter-egg-slide.glitching::before {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
   background: repeating-linear-gradient(
-    135deg,
-    #ffffff,
-    #ffffff 10px,
-    #f1f5f7 10px,
-    #f1f5f7 20px
+    0deg,
+    transparent 0 10px,
+    rgba(0, 110, 230, 0.11) 10px 12px,
+    transparent 12px 23px,
+    rgba(196, 60, 162, 0.09) 23px 24px
   );
-  font-family: monospace;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation: glitch-scan 0.32s steps(3) infinite;
 }
-.anomaly-card.glitching,
-.anomaly-slide.glitching {
-  animation: glitch 0.12s steps(2) 7;
+.easter-egg-slide h2[data-glitch] {
+  position: relative;
 }
-@keyframes glitch {
+.easter-egg-slide.glitching h2::before,
+.easter-egg-slide.glitching h2::after {
+  content: attr(data-glitch);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.easter-egg-slide.glitching h2::before {
+  color: var(--blue);
+  clip-path: inset(8% 0 58%);
+  transform: translateX(-5px);
+}
+.easter-egg-slide.glitching h2::after {
+  color: #c43ca2;
+  clip-path: inset(57% 0 9%);
+  transform: translateX(5px);
+}
+@keyframes glitch-signal {
   50% {
-    transform: translate(8px, -3px) skewX(4deg);
-    filter: hue-rotate(140deg);
+    filter: contrast(1.14) saturate(1.18);
+  }
+}
+@keyframes glitch-scan {
+  to {
+    transform: translateY(24px);
   }
 }
 .mining-mode .booth-card[data-open] {
   cursor: crosshair;
 }
-.booth-card.breaking {
+.mining-mode .booth-card:hover {
+  border-color: var(--line);
+  background: #ffffff;
+  box-shadow: none;
+  transform: none;
+}
+.booth-card.cracking,
+.booth-card.removed {
   position: relative;
   overflow: hidden;
-  pointer-events: none;
-  animation: break-cell 0.65s steps(5) forwards;
 }
-.booth-card.breaking::after {
+.booth-card.cracking::after {
   content: "";
   position: absolute;
   z-index: 4;
   inset: 0;
-  background: var(--break-frame) center / 94% 145% no-repeat;
+  background: var(--break-frame) center / 96% 96% no-repeat;
   image-rendering: pixelated;
+  mix-blend-mode: multiply;
+  opacity: 0.82;
   pointer-events: none;
-  animation: minecraft-debris 0.65s steps(6) forwards;
 }
-@keyframes break-cell {
+.booth-card.removed {
+  visibility: hidden;
+  pointer-events: none;
+}
+.block-particle {
+  position: absolute;
+  z-index: 8;
+  width: clamp(7px, 0.8vw, 13px);
+  aspect-ratio: 1;
+  background: var(--particle-color, var(--orange));
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  animation: block-burst 0.7s cubic-bezier(0.16, 0.72, 0.3, 1) forwards;
+}
+@keyframes block-burst {
   to {
-    background-color: #d8e0df;
-    color: rgba(16, 32, 51, 0.12);
-  }
-}
-@keyframes minecraft-debris {
-  from {
     opacity: 0;
-    transform: scale(0.45) rotate(-5deg);
-  }
-  28% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0.18;
-    transform: scale(1.18) rotate(3deg);
+    transform: translate(var(--particle-x), var(--particle-y))
+      rotate(var(--particle-rotation)) scale(0.35);
   }
 }
 .footer-code {
   display: flex;
   align-items: center;
-  gap: 18px;
-  font: 800 20px monospace;
+  gap: 6px;
+  font-family: "DM Sans", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 .footer-code label {
   display: flex;
@@ -649,20 +727,22 @@ dd {
   color: var(--orange);
 }
 .footer-code input {
-  width: 3.2em;
-  margin-left: 3px;
+  width: 3em;
+  margin-left: 1px;
   padding: 3px 2px;
-  border: 0;
   border: 0;
   background: transparent;
   color: var(--ink);
   outline: none;
-  font: 700 18px monospace;
+  font-family: "DM Sans", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   text-transform: lowercase;
 }
 .footer-code label:nth-child(2) input,
 .footer-code label:nth-child(3) input {
-  width: 2.3em;
+  width: 2em;
 }
 .footer-code input:focus {
   outline: 0;
@@ -679,9 +759,9 @@ dd {
   position: fixed;
   z-index: 120;
   left: 50%;
-  top: 30px;
+  top: 50%;
   width: min(620px, calc(100vw - 32px));
-  padding: 22px 28px;
+  padding: 24px 56px 24px 28px;
   border: 2px solid var(--orange);
   border-radius: 10px;
   background: var(--surface);
@@ -690,18 +770,22 @@ dd {
   font:
     800 16px/1.5 "DM Sans",
     "Noto Sans KR",
+    "Malgun Gothic",
     sans-serif;
   letter-spacing: 0.03em;
   text-align: center;
   opacity: 0;
-  transform: translate(-50%, -20px);
+  transform: translate(-50%, -50%) scale(0.97);
   pointer-events: none;
   transition: 0.3s;
 }
 .toast-message {
   display: block;
   color: var(--muted);
-  font: 700 14px/1.3 monospace;
+  font-family: "DM Sans", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
   letter-spacing: 0.11em;
 }
 .toast-keyword {
@@ -712,9 +796,51 @@ dd {
   line-height: 1.1;
   letter-spacing: 0.02em;
 }
+.toast-close {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 23px;
+  line-height: 1;
+}
+.toast-close:hover,
+.toast-close:focus-visible {
+  border-color: var(--orange);
+  color: var(--orange);
+  outline: none;
+}
+.toast-hint {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--orange);
+  background: var(--paper);
+  text-align: left;
+}
+.toast-hint small {
+  display: block;
+  color: var(--orange);
+  font: 800 15px/1.2 monospace;
+  letter-spacing: 0.12em;
+}
+.toast-hint p {
+  margin: 7px 0 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+  word-break: keep-all;
+}
 .egg-toast.show {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
 }
 .egg-toast.final {
   width: min(760px, calc(100vw - 32px));
@@ -773,30 +899,15 @@ dd {
     transform: translate(58vw, -20px) scale(0.72) rotate(8deg);
   }
 }
-.egg-flash::before {
-  content: "";
-  position: fixed;
-  z-index: 110;
-  inset: 0;
-  border: 5px solid var(--orange);
-  pointer-events: none;
-  animation: egg-flash 0.5s ease-out;
-}
-@keyframes egg-flash {
-  to {
-    opacity: 0;
-  }
-}
-.puzzle-grid {
-  display: grid;
+.booth-grid.puzzle-mode {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-top: 28px;
   padding: 8px;
+  border: 0;
   background: #e6eef2;
 }
-.puzzle-grid > button,
-.puzzle-grid > span {
+.booth-grid.puzzle-mode > .puzzle-tile,
+.booth-grid.puzzle-mode > .puzzle-empty {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -805,31 +916,41 @@ dd {
   color: var(--orange);
   font: 800 16px monospace;
 }
-.puzzle-grid > button {
-  padding: 12px;
+.booth-grid.puzzle-mode > .puzzle-tile {
+  padding: clamp(12px, 2vw, 24px);
   align-content: center;
   text-align: left;
+  cursor: pointer;
+  transition: 0.22s ease;
 }
-.puzzle-grid > button small,
-.puzzle-grid > button strong,
-.puzzle-grid > button span {
+.booth-grid.puzzle-mode > .puzzle-tile:hover {
+  border-color: var(--orange);
+  box-shadow: 0 10px 28px rgba(0, 127, 114, 0.14);
+  transform: translateY(-3px);
+}
+.puzzle-tile small,
+.puzzle-tile strong,
+.puzzle-tile span {
   display: block;
 }
-.puzzle-grid > button small {
+.puzzle-tile small {
   color: var(--orange);
   font-size: 15px;
 }
-.puzzle-grid > button strong {
+.puzzle-tile strong {
   margin: 7px 0;
-  font-size: 15px;
+  font-size: clamp(15px, 1.5vw, 20px);
   line-height: 1.2;
 }
-.puzzle-grid > button span {
+.puzzle-tile span {
   color: var(--muted);
-  font: 500 13px/1.4 "Noto Sans KR", sans-serif;
+  font: 500 14px/1.45 "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
-.puzzle-grid > span {
+.booth-grid.puzzle-mode > .puzzle-empty {
   background: transparent;
+}
+.booth-grid.puzzle-complete {
+  box-shadow: inset 0 0 0 3px var(--orange);
 }
 @media (max-width: 900px) {
   .hero {
@@ -902,6 +1023,17 @@ dd {
   .booth-grid {
     grid-template-columns: 1fr;
   }
+  .booth-grid.puzzle-mode {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+  }
+  .booth-grid.puzzle-mode > .puzzle-tile {
+    padding: 8px;
+  }
+  .puzzle-tile span {
+    display: none;
+  }
   .booth-card {
     min-height: 260px;
   }
@@ -920,10 +1052,13 @@ dd {
     border-bottom: 1px solid var(--line);
   }
   footer {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: flex-start;
     gap: 15px;
     padding: 40px 20px;
+  }
+  footer .egg-count {
+    width: 100%;
   }
   dialog {
     padding: 38px 24px;

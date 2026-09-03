@@ -51,7 +51,7 @@ const booths = [
     "자유 관람",
     "전시",
     "초3–고3",
-    "단서를 활용해 웹사이트 곳곳에 숨겨진 이스터에그를 발견합니다.",
+    "이 카드를 눌러 첫 번째 이스터에그를 획득해보세요!.",
   ],
   [
     "꿈: 우리는 모두 어린왕자였다",
@@ -137,27 +137,18 @@ const booths = [
 }));
 
 const colors = ["#007f72", "#006ee6", "#7657d6", "#c43ca2"];
-const anomalySlide = {
-  anomaly: true,
-  name: "undefined",
-  club: "NULL",
-  place: "/dev/null",
-  time: "NaN분",
-  age: "ACCESS DENIED",
-  description: "이 항목은 존재하지 않습니다. 정말로 확인하시겠습니까?",
-};
-const carouselItems = [...booths];
-carouselItems.splice(5, 0, anomalySlide);
+const carouselItems = booths;
 const slides = document.querySelector("#slides");
 const grid = document.querySelector("#booth-grid");
 const dialog = document.querySelector("#booth-dialog");
+let currentPlace = "전체";
 let current = 0,
   timer;
 
 slides.innerHTML = carouselItems
   .map(
     (b, i) =>
-      `<article class="slide${i === 0 ? " active" : ""}${b.anomaly ? " anomaly-slide" : ""}" ${b.anomaly ? "data-anomaly" : ""} style="--accent:${b.anomaly ? "#102033" : colors[i % 4]}"><div class="slide-number">${b.anomaly ? "??" : String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2>${b.name}</h2><p>${b.description}</p><div class="slide-meta"><span>⌖ ${b.place}</span><span>◷ ${b.time}</span><span>${b.age}</span></div></article>`,
+      `<article class="slide${i === 0 ? " active" : ""}${b.index === 5 ? " easter-egg-slide" : ""}" ${b.index === 5 ? "data-anomaly" : ""} style="--accent:${colors[i % 4]}"><div class="slide-number">${String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2${b.index === 5 ? ` data-glitch="${b.name}"` : ""}>${b.name}</h2><p>${b.description}</p><div class="slide-meta"><span>⌖ ${b.place}</span><span>◷ ${b.time}</span><span>${b.age}</span></div></article>`,
   )
   .join("");
 
@@ -170,12 +161,17 @@ function showSlide(next) {
     `${String(current + 1).padStart(2, "0")} / ${carouselItems.length}`;
   const bar = document.querySelector("#progress");
   bar.style.animation = "none";
+  bar.style.animationPlayState = "running";
   bar.offsetHeight;
   bar.style.animation = "fill 5s linear forwards";
 }
 function autoplay() {
   clearInterval(timer);
   timer = setInterval(() => showSlide(current + 1), 5000);
+}
+function pauseAutoplay() {
+  clearInterval(timer);
+  document.querySelector("#progress").style.animationPlayState = "paused";
 }
 document.querySelector("#prev").onclick = () => {
   showSlide(current - 1);
@@ -190,6 +186,9 @@ function card(b) {
   return `<button class="booth-card" data-open="${b.index}" style="--accent:${colors[b.index % 4]}"><span>${String(b.index + 1).padStart(2, "0")} · ${b.club}</span><h3>${b.name}</h3><p>${b.description}</p><div><b>${b.place}</b><small>${b.time} · ${b.people}</small></div></button>`;
 }
 function render(place = "전체") {
+  currentPlace = place;
+  grid.classList.remove("puzzle-mode", "puzzle-complete");
+  grid.onclick = null;
   const cards = booths
     .filter((b) => place === "전체" || b.place === place)
     .map(card);
@@ -198,25 +197,29 @@ function render(place = "전체") {
 function openBooth(index) {
   const b = booths[index];
   document.querySelector("#dialog-content").innerHTML =
-    `<small>${String(index + 1).padStart(2, "0")} — ${b.club}</small><h2>${b.name}</h2><p>${b.description}</p><dl><div><dt>장소</dt><dd>${b.place}</dd></div><div><dt>소요 시간</dt><dd>${b.time}</dd></div><div><dt>1회 인원</dt><dd>${b.people}</dd></div><div><dt>권장 대상</dt><dd>${b.age}</dd></div></dl>`;
+    `<small>${String(index + 1).padStart(2, "0")} — ${b.club}</small><h2>${b.name}</h2><p>${b.description}</p><dl><div><dt>장소</dt><dd>${b.place}</dd></div><div><dt>소요 시간</dt><dd>${b.time}</dd></div><div><dt>수용 인원</dt><dd>${b.people}</dd></div><div><dt>권장 대상</dt><dd>${b.age}</dd></div></dl>`;
   dialog.showModal();
 }
 document.addEventListener("click", (e) => {
   const target = e.target.closest("[data-open]");
   if (!target) return;
-  if (miningMode) {
-    breakBoothCard(target);
-    return;
-  }
+  if (miningMode) return;
   openBooth(Number(target.dataset.open));
 });
 document.querySelector("#filters").onclick = (e) => {
   const button = e.target.closest("button");
   if (!button) return;
   if (button.dataset.place === "8-puzzle") {
+    resetMiningState();
+    document
+      .querySelectorAll("#filters button")
+      .forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
     openPuzzle();
     return;
   }
+  if (miningMode && button.dataset.place === "전체") return;
+  if (button.dataset.place !== "전체") resetMiningState();
   document
     .querySelectorAll("#filters button")
     .forEach((b) => b.classList.remove("active"));
@@ -242,16 +245,38 @@ const eggWords = [
   "Tomorrow",
   "Together",
 ];
-const EGG_RESET_DELAY = 10 * 60 * 1000;
-const foundEggs = new Set();
-const eggResetTimers = new Map();
+const eggHints = [
+  "자동으로 넘어가는 카드 사이에 낯선 신호가 섞여 있습니다.",
+  "페이지의 시작과 끝을 짧은 시간 안에 모두 확인해 보세요.",
+  "Footer에 남은 C, T, D 사이에는 보이지 않는 글자가 필요합니다.",
+  "부스 목록 근처에는 배경과 같은 색의 행사 이름이 숨어 있습니다.",
+  "메인 화면의 구름이는 간지럼을 꽤 많이 탑니다.",
+  "마인크래프트 부스 카드를 잠시 누르고 있으면 세계가 달라집니다.",
+  "부스 필터 사이에 실제 장소가 아닌 퍼즐 하나가 숨어 있습니다.",
+  "페이지 아래의 길 잃은 구름이와 흐릿한 모양을 비교해 보세요.",
+];
 const toast = document.querySelector(".egg-toast");
-let toastTimer;
-let finalResetTimer;
 
-function showToast(message, final = false, keyword = "") {
-  clearTimeout(toastTimer);
+function getNextEggHint(number) {
+  return eggHints[number % eggHints.length];
+}
+
+function hideToast() {
+  toast.classList.remove("show");
+}
+
+function showToast(message, final = false, keyword = "", hint = "") {
+  if (toast.classList.contains("show")) {
+    return false;
+  }
   toast.replaceChildren();
+  const closeButton = document.createElement("button");
+  closeButton.className = "toast-close";
+  closeButton.type = "button";
+  closeButton.setAttribute("aria-label", "팝업 닫기");
+  closeButton.textContent = "×";
+  closeButton.addEventListener("click", hideToast);
+  toast.append(closeButton);
   const toastMessage = document.createElement("span");
   toastMessage.className = "toast-message";
   toastMessage.textContent = message;
@@ -262,71 +287,41 @@ function showToast(message, final = false, keyword = "") {
     toastKeyword.textContent = keyword;
     toast.append(toastKeyword);
   }
+  if (hint) {
+    const hintBox = document.createElement("div");
+    hintBox.className = "toast-hint";
+    hintBox.innerHTML = `<small>NEXT HINT</small><p></p>`;
+    hintBox.querySelector("p").textContent = hint;
+    toast.append(hintBox);
+  }
   toast.classList.toggle("final", final);
   toast.classList.add("show");
-  toastTimer = setTimeout(
-    () => toast.classList.remove("show"),
-    final ? 7000 : 2800,
-  );
+  return true;
 }
 
 function discoverEgg(number) {
-  if (foundEggs.has(number)) {
-    clearTimeout(eggResetTimers.get(number));
-    eggResetTimers.set(
-      number,
-      setTimeout(() => resetEgg(number), EGG_RESET_DELAY),
-    );
-    showToast(
-      `이스터에그 발견!`,
-      false,
-      `#${String(number).padStart(2, "0")} ${eggWords[number - 1]}`,
-    );
-    return;
-  }
-  foundEggs.add(number);
-  clearTimeout(eggResetTimers.get(number));
-  eggResetTimers.set(
-    number,
-    setTimeout(() => resetEgg(number), EGG_RESET_DELAY),
-  );
-  document.body.classList.add("egg-flash");
-  setTimeout(() => document.body.classList.remove("egg-flash"), 500);
   showToast(
     `이스터에그 발견!`,
     false,
-    `#${String(number).padStart(2, "0")} ${eggWords[number - 1]}`,
+    `#${String(number)} ${eggWords[number - 1]}`,
+    getNextEggHint(number),
   );
-  if (foundEggs.size === eggWords.length) {
-    clearTimeout(finalResetTimer);
-    finalResetTimer = setTimeout(
-      () => showToast("WE CODE THE DAY AND BUILD TOMORROW TOGETHER.", true),
-      700,
-    );
-    setTimeout(resetAllEggs, 8000);
-  }
 }
 
-function resetEgg(number) {
-  foundEggs.delete(number);
-  clearTimeout(eggResetTimers.get(number));
-  eggResetTimers.delete(number);
-}
-
-function resetAllEggs() {
-  foundEggs.clear();
-  eggResetTimers.forEach((timer) => clearTimeout(timer));
-  eggResetTimers.clear();
-  clearTimeout(finalResetTimer);
-}
-
-// #1 NULL: anomalous booth card.
+// #1 NULL: the Life is Easter Egg carousel card.
+let anomalyEffectTimer;
 document.addEventListener("click", (event) => {
   const anomaly = event.target.closest("[data-anomaly]");
   if (!anomaly) return;
+  clearTimeout(anomalyEffectTimer);
+  pauseAutoplay();
   anomaly.classList.add("glitching");
   discoverEgg(1);
-  setTimeout(() => anomaly.classList.remove("glitching"), 900);
+  anomalyEffectTimer = setTimeout(() => {
+    anomaly.classList.remove("glitching");
+    showSlide(current + 1);
+    autoplay();
+  }, 1400);
 });
 
 // #2 NULL: reach both document boundaries within 45 seconds.
@@ -487,39 +482,137 @@ draggableMascot.addEventListener("keydown", (event) => {
 });
 
 // #6 Neuron: hold Minecraft, then break every real booth card.
-let holdTimer;
+const CRACK_FRAME_COUNT = 6;
+const CRACK_HOLD_DURATION = 1200;
+let crackAnimationFrame;
+let crackTarget = null;
+let crackStage = 0;
+let crackStartedAt = 0;
+let crackCompletion = null;
 let miningMode = false;
 let brokenBooths = new Set();
-document.addEventListener("pointerdown", (event) => {
-  const target = event.target.closest('.booth-card[data-open="7"]');
-  if (!target || miningMode) return;
-  holdTimer = setTimeout(() => {
-    miningMode = true;
-    brokenBooths.clear();
-    document.querySelector('[data-place="전체"]').click();
-    document.body.classList.add("mining-mode");
-    showToast("MINING MODE · 모든 부스 셀을 부숴보세요.");
-  }, 750);
-});
-document.addEventListener("pointerup", () => clearTimeout(holdTimer));
-document.addEventListener("pointercancel", () => clearTimeout(holdTimer));
-function breakBoothCard(cardElement) {
-  const index = Number(cardElement.dataset.open);
-  if (brokenBooths.has(index)) return;
-  brokenBooths.add(index);
-  cardElement.classList.add("breaking");
+
+function setCrackFrame(cardElement, stage) {
+  cardElement.classList.add("cracking");
   cardElement.style.setProperty(
     "--break-frame",
-    'url("assets/minecraft/break-particles.png")',
+    `url("assets/minecraft/crack-${String(stage).padStart(2, "0")}.png")`,
   );
+}
+
+function cancelCracking() {
+  cancelAnimationFrame(crackAnimationFrame);
+  const targetIndex = Number(crackTarget?.dataset.open);
+  if (crackTarget && !brokenBooths.has(targetIndex)) {
+    crackTarget.classList.remove("cracking");
+    crackTarget.style.removeProperty("--break-frame");
+    delete crackTarget.dataset.cracking;
+  }
+  crackTarget = null;
+  crackStage = 0;
+  crackStartedAt = 0;
+  crackCompletion = null;
+}
+
+function updateCracking(now) {
+  if (!crackTarget) return;
+  const elapsed = now - crackStartedAt;
+  const nextStage = Math.min(
+    CRACK_FRAME_COUNT,
+    Math.floor((elapsed / CRACK_HOLD_DURATION) * CRACK_FRAME_COUNT) + 1,
+  );
+  if (nextStage !== crackStage) {
+    crackStage = nextStage;
+    setCrackFrame(crackTarget, crackStage);
+  }
+  if (elapsed < CRACK_HOLD_DURATION) {
+    crackAnimationFrame = requestAnimationFrame(updateCracking);
+    return;
+  }
+  const completedTarget = crackTarget;
+  const onComplete = crackCompletion;
+  crackTarget = null;
+  crackCompletion = null;
+  delete completedTarget.dataset.cracking;
+  onComplete(completedTarget);
+}
+
+function startCracking(cardElement, onComplete) {
+  cancelCracking();
+  crackTarget = cardElement;
+  crackStage = 1;
+  crackStartedAt = performance.now();
+  crackCompletion = onComplete;
+  cardElement.dataset.cracking = "true";
+  setCrackFrame(cardElement, crackStage);
+  crackAnimationFrame = requestAnimationFrame(updateCracking);
+}
+
+function enterMiningMode() {
+  miningMode = true;
+  brokenBooths.clear();
+  document.body.classList.add("mining-mode");
+  grid.classList.add("mining-board");
+  const minecraftCard = document.querySelector('.booth-card[data-open="7"]');
+  setCrackFrame(minecraftCard, CRACK_FRAME_COUNT);
+  minecraftCard.classList.remove("cracking");
+  brokenBooths.add(7);
+  removeCardWithParticles(minecraftCard);
+  crackTarget = null;
+  crackStage = 0;
+}
+
+document.addEventListener("pointerdown", (event) => {
+  const target = event.target.closest(".booth-card[data-open]");
+  if (!target) return;
+  const index = Number(target.dataset.open);
+  if (
+    currentPlace !== "전체" ||
+    (!miningMode && index !== 7) ||
+    brokenBooths.has(index)
+  )
+    return;
+  startCracking(target, miningMode ? completeBoothBreak : enterMiningMode);
+});
+document.addEventListener("pointerup", cancelCracking);
+document.addEventListener("pointercancel", cancelCracking);
+
+function completeBoothBreak(cardElement) {
+  const index = Number(cardElement.dataset.open);
+  cardElement.classList.remove("cracking");
+  brokenBooths.add(index);
+  removeCardWithParticles(cardElement);
   if (brokenBooths.size !== booths.length) return;
+  grid.classList.add("image-revealed");
   discoverEgg(6);
-  setTimeout(() => {
-    miningMode = false;
-    brokenBooths.clear();
-    document.body.classList.remove("mining-mode");
-    render();
-  }, 1300);
+}
+
+function removeCardWithParticles(cardElement) {
+  const cardRect = cardElement.getBoundingClientRect();
+  const gridRect = grid.getBoundingClientRect();
+  const accent = getComputedStyle(cardElement).getPropertyValue("--accent");
+  for (let index = 0; index < 22; index += 1) {
+    const particle = document.createElement("i");
+    particle.className = "block-particle";
+    particle.setAttribute("aria-hidden", "true");
+    particle.style.left = `${cardRect.left - gridRect.left + Math.random() * cardRect.width}px`;
+    particle.style.top = `${cardRect.top - gridRect.top + Math.random() * cardRect.height}px`;
+    particle.style.setProperty("--particle-color", accent);
+    particle.style.setProperty("--particle-x", `${Math.random() * 180 - 90}px`);
+    particle.style.setProperty("--particle-y", `${Math.random() * 150 - 110}px`);
+    particle.style.setProperty("--particle-rotation", `${Math.random() * 360}deg`);
+    grid.append(particle);
+    setTimeout(() => particle.remove(), 720);
+  }
+  cardElement.classList.add("removed");
+}
+
+function resetMiningState() {
+  cancelCracking();
+  miningMode = false;
+  brokenBooths.clear();
+  document.body.classList.remove("mining-mode");
+  grid.classList.remove("mining-board", "image-revealed");
 }
 
 // #7 BP: always-solvable 8-puzzle, shuffled with valid moves.
@@ -550,21 +643,20 @@ function openPuzzle() {
     [tiles[7], tiles[8]] = [tiles[8], tiles[7]];
     empty = 7;
   }
-  const content = document.querySelector("#dialog-content");
-  content.innerHTML =
-    '<small>BP · 8-PUZZLE</small><h2>부스 셀을 복구하세요.</h2><p>빈칸 옆의 부스 설명 셀을 움직여 원래 순서로 맞춰보세요.</p><div class="puzzle-grid"></div>';
-  const puzzle = content.querySelector(".puzzle-grid");
+  currentPlace = "8-puzzle";
+  grid.classList.remove("mining-board", "image-revealed");
+  grid.classList.add("puzzle-mode");
   function drawPuzzle() {
-    puzzle.innerHTML = tiles
+    grid.innerHTML = tiles
       .map((tile, index) =>
         tile
-          ? `<button data-tile-index="${index}"><small>${String(tile).padStart(2, "0")} · ${booths[tile - 1].club}</small><strong>${booths[tile - 1].name}</strong><span>${booths[tile - 1].description}</span></button>`
-          : '<span aria-label="빈칸"></span>',
+          ? `<button class="puzzle-tile" data-tile-index="${index}"><small>${String(tile).padStart(2, "0")} · ${booths[tile - 1].club}</small><strong>${booths[tile - 1].name}</strong><span>${booths[tile - 1].description}</span></button>`
+          : '<span class="puzzle-empty" aria-label="빈칸"></span>',
       )
       .join("");
   }
-  puzzle.onclick = (event) => {
-    const tile = event.target.closest("button");
+  grid.onclick = (event) => {
+    const tile = event.target.closest(".puzzle-tile");
     if (!tile) return;
     const index = Number(tile.dataset.tileIndex);
     const distance =
@@ -576,9 +668,8 @@ function openPuzzle() {
     drawPuzzle();
     if (tiles.every((value, position) => value === (position + 1) % 9)) {
       discoverEgg(7);
-      setTimeout(() => dialog.close(), 900);
+      grid.classList.add("puzzle-complete");
     }
   };
   drawPuzzle();
-  dialog.showModal();
 }
