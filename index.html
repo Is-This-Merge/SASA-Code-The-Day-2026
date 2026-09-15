@@ -8,7 +8,9 @@
       name="description"
       content="SASA가 주최하는 2026 정보과학의 날, Code The Day 부스 및 운영 안내"
     />
-    <title>Code The Day 2026 | SASA 정보과학의 날</title>
+    <title>Code The Day 2026</title>
+    <link rel="icon" href="assets/favicon.svg?v=2" type="image/svg+xml" />
+    <link rel="shortcut icon" href="assets/favicon.svg?v=2" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -16,17 +18,11 @@
       <section class="hero" id="home">
         <div class="grid-bg" aria-hidden="true"></div>
         <div class="scan-line" aria-hidden="true"></div>
-        <div class="system-status" aria-hidden="true">
-          <span>SASA</span><span>260918</span>
-        </div>
         <div class="hero-copy">
           <h1>
-            <span>Welcome to</span><em>Code The Day!</em>
+            <span>Welcome to</span><em>C.O.D.E. The Day!</em>
           </h1>
-          <p class="lead">
-            오늘, 미래를 실행하세요.<br />네 정보과학 동아리가 준비한 다양한
-            체험이 기다립니다.
-          </p>
+          <i class="lead">- Creating Our Digital Era -</i>
         </div>
 
         <figure
@@ -59,7 +55,7 @@
           <h2>장소별 부스</h2>
         </div>
         <span class="selection-secret" aria-label="숨겨진 정보과학의 날 문구"
-          >정보과학의 날</span
+          >이스터에그</span
         >
         <div class="filters" id="filters" aria-label="장소 필터">
           <button class="active" data-place="전체">전체 14</button
@@ -67,9 +63,32 @@
           ><button data-place="2층 로비">2층 로비</button
           ><button data-place="S108">S108</button
           ><button data-place="S109">S109</button
-          ><button data-place="8-puzzle">8-puzzle</button>
+          ><button data-place="5-puzzle">5-puzzle</button>
         </div>
         <div class="booth-grid" id="booth-grid"></div>
+
+        <aside class="booth-status" id="booth-status">
+          <div class="status-copy">
+            <small>LIVE BOOTH STATUS</small>
+            <h3>실시간 부스 현황</h3>
+            <p>대기 인원과 운영 상태를 확인할 수 있는 사이트입니다.</p>
+            <a href="https://script.google.com/macros/s/AKfycbwcv3N1f_JTtlOTJz2liA9klTKtQGgFfuMFsWpec19HRhptp2bCkN7bPzYsqWGUjdb5/exec">부스 현황 조회 사이트로 이동 →</a>
+          </div>
+          <div class="mascot-dock" id="mascot-dock" aria-hidden="true"></div>
+          <div
+            class="status-qr-frame"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="새 창에서 실시간 부스 현황 조회"
+          >
+            <img
+              src="assets/qr.svg"
+              alt="부스 현황 조회 사이트 QR 코드"
+              class="status-qr"
+            />
+            <small>SCAN FOR LIVE STATUS</small>
+          </a>
+        </aside>
       </section>
 
       <section class="guide" id="guide" aria-label="행사 운영 정보">
@@ -79,58 +98,65 @@
             <p>8~9교시 운영</p>
           </article>
           <article>
-            <small>지역민</small><strong>19:00 — 20:50</strong>
+            <small>방문객</small><strong>19:00 — 20:50</strong>
             <p>1차 자습 시간 운영</p>
           </article>
           <article>
-            <small>운영 장소</small><strong>1층 로비, 2층 로비</strong>
-            <p>S108 · S109 포함</p>
+            <small>운영 장소</small>
+            <ul class="venue-list" aria-label="운영 장소 목록">
+              <li>1층 로비</li>
+              <li>2층 로비</li>
+              <li>S108</li>
+              <li>S109</li>
+            </ul>
           </article>
         </div>
       </section>
     </main>
 
     <section class="mascot-playground" aria-label="구름이 휴게 공간">
+      <p class="egg-count">
+        웹사이트 곳곳에 숨겨진 8가지 이스터에그를 찾아 순서대로 나열해 하나의 문장으로 완성해보세요!
+      </p>
       <figure
         class="draggable-mascot"
         tabindex="0"
         role="button"
-        aria-label="움직일 수 있는 구름이. 오른쪽 도킹 지점으로 옮기세요"
+        aria-label="움직일 수 있는 SASA 마스코트 구름이"
       >
         <img
-          src="assets/sasa-mascot-worried.png"
-          alt="길을 잃은 SASA 마스코트 구름이"
+          src="assets/sasa-mascot-wave.png"
+          alt="손을 흔드는 SASA 마스코트 구름이"
           draggable="false"
         />
       </figure>
-      <div class="mascot-dock" id="mascot-dock" aria-hidden="true"></div>
     </section>
 
     <footer>
-      <small class="egg-count">웹사이트 곳곳에 숨겨진 8가지 이스터에그를 찾아 순서대로 나열해 하나의 문장으로 완성해보세요!</small>
       <div class="footer-code" aria-label="Code The Day 문구 완성하기">
         <label
-          >C<input
+          ><b aria-hidden="true">C</b><input
             data-ctd-part="ode"
             maxlength="3"
             autocomplete="off"
-            aria-label="C 다음 글자 입력"
+            aria-label="Code 또는 코드의 첫 부분 입력"
         /></label>
         <label
-          >T<input
+          ><b aria-hidden="true">T</b><input
             data-ctd-part="he"
             maxlength="2"
             autocomplete="off"
-            aria-label="T 다음 글자 입력"
+            aria-label="The 또는 더의 두 번째 부분 입력"
         /></label>
         <label
-          >D<input
+          ><b aria-hidden="true">D</b><input
             data-ctd-part="ay"
             maxlength="2"
             autocomplete="off"
-            aria-label="D 다음 글자 입력"
+            aria-label="Day 또는 데이의 세 번째 부분 입력"
         /></label>
       </div>
+      <small class="copyright">© 2026 SASA. All rights reserved.</small>
       <small>2026. 09. 18.</small>
     </footer>
 

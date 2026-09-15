@@ -51,7 +51,7 @@ const booths = [
     "자유 관람",
     "전시",
     "초3–고3",
-    "이 카드를 눌러 첫 번째 이스터에그를 획득해보세요!.",
+    "페이지 곳곳에 숨겨진 단서와 상호작용을 찾아 하나의 문장을 완성하는 참여형 전시입니다.",
   ],
   [
     "꿈: 우리는 모두 어린왕자였다",
@@ -136,11 +136,43 @@ const booths = [
   index,
 }));
 
+const boothImageFiles = [
+  "AI를 해방시켜라.png",
+  "피싱 대학.png",
+  "위키 레이싱.png",
+  "세미 CTF.png",
+  "내가 코딩 언어라면.png",
+  "Life is Easter Egg.png",
+  "꿈 우리는 모두 어린왕자였다.png",
+  "마인크래프트 속으로.png",
+  "AI 100% 활용하는 법.png",
+  "AI를 설득해보자.png",
+  "DUELIST.png",
+  "모구모구 정렬.png",
+  "뿅뿅 오락실.png",
+  "도전! 코딩 챌린지.png",
+];
+
+booths.forEach((booth, index) => {
+  booth.image =
+    index === 7
+      ? null
+      : `assets/부스 이미지/cropped/${boothImageFiles[index]}`;
+});
+
 const colors = ["#007f72", "#006ee6", "#7657d6", "#c43ca2"];
 const carouselItems = booths;
 const slides = document.querySelector("#slides");
 const grid = document.querySelector("#booth-grid");
 const dialog = document.querySelector("#booth-dialog");
+const metaIcons = {
+  place:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  time:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  age:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6.5 20v-2.5a5.5 5.5 0 0 1 11 0V20"/></svg>',
+};
 let currentPlace = "전체";
 let current = 0,
   timer;
@@ -148,7 +180,7 @@ let current = 0,
 slides.innerHTML = carouselItems
   .map(
     (b, i) =>
-      `<article class="slide${i === 0 ? " active" : ""}${b.index === 5 ? " easter-egg-slide" : ""}" ${b.index === 5 ? "data-anomaly" : ""} style="--accent:${colors[i % 4]}"><div class="slide-number">${String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2${b.index === 5 ? ` data-glitch="${b.name}"` : ""}>${b.name}</h2><p>${b.description}</p><div class="slide-meta"><span>⌖ ${b.place}</span><span>◷ ${b.time}</span><span>${b.age}</span></div></article>`,
+      `<article class="slide${i === 0 ? " active" : ""}${b.index === 5 ? " easter-egg-slide" : ""}" ${b.index === 5 ? "data-anomaly" : ""} style="--accent:${colors[i % 4]}"><div class="slide-number">${String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2${b.index === 5 ? ` data-glitch="${b.name}"` : ""}>${b.name}</h2><p>${b.index === 5 ? "이 카드 자체가 이스터에그입니다. 클릭해 첫 번째 신호를 확인해보세요." : b.description}</p><div class="slide-meta"><span class="meta-badge">${metaIcons.place}<span>${b.place}</span></span><span class="meta-badge">${metaIcons.time}<span>${b.time}</span></span><span class="meta-badge">${metaIcons.age}<span>${b.age}</span></span></div></article>`,
   )
   .join("");
 
@@ -187,7 +219,11 @@ function card(b) {
 }
 function render(place = "전체") {
   currentPlace = place;
-  grid.classList.remove("puzzle-mode", "puzzle-complete");
+  grid.classList.remove(
+    "puzzle-mode",
+    "mining-board",
+    "image-revealed",
+  );
   grid.onclick = null;
   const cards = booths
     .filter((b) => place === "전체" || b.place === place)
@@ -196,8 +232,11 @@ function render(place = "전체") {
 }
 function openBooth(index) {
   const b = booths[index];
+  const poster = b.image
+    ? `<figure class="dialog-poster"><img src="${b.image}" alt="${b.name} 부스 이미지" decoding="async" /></figure>`
+    : `<figure class="dialog-poster dialog-poster-empty" aria-label="${b.name} 이스터에그 힌트"><div class="minecraft-detail-hint"><small>그림이 어디갔지?</small><strong>이 카드 뒤에 숨어있는 것 같은데?</strong></div></figure>`;
   document.querySelector("#dialog-content").innerHTML =
-    `<small>${String(index + 1).padStart(2, "0")} — ${b.club}</small><h2>${b.name}</h2><p>${b.description}</p><dl><div><dt>장소</dt><dd>${b.place}</dd></div><div><dt>소요 시간</dt><dd>${b.time}</dd></div><div><dt>수용 인원</dt><dd>${b.people}</dd></div><div><dt>권장 대상</dt><dd>${b.age}</dd></div></dl>`;
+    `<div class="dialog-layout">${poster}<div class="dialog-copy"><small>${String(index + 1).padStart(2, "0")} — ${b.club}</small><h2>${b.name}</h2><p>${b.description}</p><dl><div><dt>장소</dt><dd>${b.place}</dd></div><div><dt>소요 시간</dt><dd>${b.time}</dd></div><div><dt>수용 인원</dt><dd>${b.people}</dd></div><div><dt>권장 대상</dt><dd>${b.age}</dd></div></dl></div></div>`;
   dialog.showModal();
 }
 document.addEventListener("click", (e) => {
@@ -209,7 +248,7 @@ document.addEventListener("click", (e) => {
 document.querySelector("#filters").onclick = (e) => {
   const button = e.target.closest("button");
   if (!button) return;
-  if (button.dataset.place === "8-puzzle") {
+  if (button.dataset.place === "5-puzzle") {
     resetMiningState();
     document
       .querySelectorAll("#filters button")
@@ -256,16 +295,31 @@ const eggHints = [
   "페이지 아래의 길 잃은 구름이와 흐릿한 모양을 비교해 보세요.",
 ];
 const toast = document.querySelector(".egg-toast");
+let activeToastEgg = null;
 
 function getNextEggHint(number) {
   return eggHints[number % eggHints.length];
 }
 
 function hideToast() {
+  const closedEgg = activeToastEgg;
+  activeToastEgg = null;
   toast.classList.remove("show");
+  document.body.classList.remove("toast-open");
+  if (closedEgg) {
+    window.dispatchEvent(
+      new CustomEvent("egg-toast-closed", { detail: { number: closedEgg } }),
+    );
+  }
 }
 
-function showToast(message, final = false, keyword = "", hint = "") {
+function showToast(
+  message,
+  final = false,
+  keyword = "",
+  hint = "",
+  hintNumber = "",
+) {
   if (toast.classList.contains("show")) {
     return false;
   }
@@ -290,22 +344,32 @@ function showToast(message, final = false, keyword = "", hint = "") {
   if (hint) {
     const hintBox = document.createElement("div");
     hintBox.className = "toast-hint";
-    hintBox.innerHTML = `<small>NEXT HINT</small><p></p>`;
+    hintBox.innerHTML = `<small></small><p></p>`;
+    hintBox.querySelector("small").textContent = `#${hintNumber} HINT`;
     hintBox.querySelector("p").textContent = hint;
     toast.append(hintBox);
   }
   toast.classList.toggle("final", final);
+  document.body.classList.add("toast-open");
   toast.classList.add("show");
   return true;
 }
 
 function discoverEgg(number) {
-  showToast(
+  if (miningMode) {
+    const place = currentPlace;
+    resetMiningState();
+    render(place);
+  }
+  const shown = showToast(
     `이스터에그 발견!`,
     false,
     `#${String(number)} ${eggWords[number - 1]}`,
     getNextEggHint(number),
+    (number % eggWords.length) + 1,
   );
+  if (shown) activeToastEgg = number;
+  return shown;
 }
 
 // #1 NULL: the Life is Easter Egg carousel card.
@@ -324,7 +388,8 @@ document.addEventListener("click", (event) => {
   }, 1400);
 });
 
-// #2 NULL: reach both document boundaries within 45 seconds.
+// #2 NULL: reach both document boundaries within 8 seconds.
+const BOUNDARY_VISIT_LIMIT = 8000;
 let topVisitedAt = window.scrollY < 20 ? Date.now() : 0;
 let bottomVisitedAt = 0;
 addEventListener(
@@ -340,7 +405,7 @@ addEventListener(
     if (
       topVisitedAt &&
       bottomVisitedAt &&
-      Math.abs(topVisitedAt - bottomVisitedAt) <= 45000
+      Math.abs(topVisitedAt - bottomVisitedAt) <= BOUNDARY_VISIT_LIMIT
     ) {
       discoverEgg(2);
       topVisitedAt = 0;
@@ -352,19 +417,32 @@ addEventListener(
 
 // #3 s0sCoD3: fill the missing letters after C, T and D.
 const ctdInputs = [...document.querySelectorAll("[data-ctd-part]")];
+const footerCode = document.querySelector(".footer-code");
+const acceptedCtdParts = ["ode", "he", "ay"];
 ctdInputs.forEach((input, index) => {
-  input.addEventListener("input", () => {
-    input.value = input.value.replace(/[^a-z]/gi, "").toLowerCase();
-    if (input.value.length === input.maxLength) ctdInputs[index + 1]?.focus();
+  input.addEventListener("input", (event) => {
+    if (event.isComposing) return;
+    input.value = input.value
+      .normalize("NFC")
+      .replace(/[^a-zㄱ-ㅎㅏ-ㅣ가-힣]/gi, "")
+      .toLowerCase();
+    const values = ctdInputs.map((field) => field.value.normalize("NFC"));
+    footerCode.classList.toggle(
+      "korean-entry",
+      values.some((value) => /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value)),
+    );
+    if (acceptedCtdParts[index] === input.value) {
+      ctdInputs[index + 1]?.focus();
+    }
     const completed = `c${ctdInputs[0].value}t${ctdInputs[1].value}d${ctdInputs[2].value}`;
     if (completed !== "codetheday") return;
     discoverEgg(3);
-    document.querySelector(".footer-code").classList.add("completed");
+    footerCode.classList.add("completed");
     setTimeout(() => {
       ctdInputs.forEach((field) => {
         field.value = "";
       });
-      document.querySelector(".footer-code").classList.remove("completed");
+      footerCode.classList.remove("completed", "korean-entry");
     }, 1600);
   });
   input.addEventListener("keydown", (event) => {
@@ -382,7 +460,7 @@ document.addEventListener("selectionchange", () => {
       ? selection.anchorNode.parentElement
       : selection?.anchorNode;
   if (
-    selection?.toString().trim() === "정보과학의 날" &&
+    selection?.toString().trim() === "이스터에그" &&
     anchorElement &&
     secret.contains(anchorElement)
   ) {
@@ -429,25 +507,105 @@ mascot.addEventListener("click", () => {
 
 // #8 BP: move the lost mascot into its dock.
 const draggableMascot = document.querySelector(".draggable-mascot");
+const draggableMascotImage = draggableMascot.querySelector("img");
 const dock = document.querySelector("#mascot-dock");
 let dragStart = null;
+let latestPointer = null;
 let mascotMoved = false;
+let mascotReturnTimer;
+let mascotScrollFrame;
+
+function stopMascotAutoScroll() {
+  cancelAnimationFrame(mascotScrollFrame);
+  mascotScrollFrame = 0;
+  document.documentElement.classList.remove("mascot-dragging");
+}
+
+function updateMascotPosition() {
+  if (!dragStart || !latestPointer) return;
+  const x =
+    latestPointer.x - dragStart.x + window.scrollX - dragStart.scrollX;
+  const y =
+    latestPointer.y - dragStart.y + window.scrollY - dragStart.scrollY;
+  if (Math.hypot(x, y) > 6) mascotMoved = true;
+  if (mascotMoved) draggableMascot.style.translate = `${x}px ${y}px`;
+}
+
+function autoScrollMascotPage() {
+  if (!dragStart || !latestPointer) return;
+  const edge = Math.min(110, window.innerHeight * 0.16);
+  let scrollAmount = 0;
+  if (latestPointer.y < edge) {
+    const intensity = (edge - latestPointer.y) / edge;
+    scrollAmount = -Math.ceil(16 * intensity * intensity);
+  } else if (latestPointer.y > window.innerHeight - edge) {
+    const intensity =
+      (latestPointer.y - (window.innerHeight - edge)) / edge;
+    scrollAmount = Math.ceil(16 * intensity * intensity);
+  }
+  if (scrollAmount) {
+    window.scrollBy(0, scrollAmount);
+    updateMascotPosition();
+  }
+  mascotScrollFrame = requestAnimationFrame(autoScrollMascotPage);
+}
+
+function completeMascotDock() {
+  stopMascotAutoScroll();
+  draggableMascot.classList.remove("dragging");
+  clearTimeout(mascotReturnTimer);
+  draggableMascotImage.src = "assets/sasa-mascot-tickled.png";
+  draggableMascot.classList.add("matched");
+  const popupShown = discoverEgg(8);
+  if (!popupShown) scheduleMascotReturn(900);
+}
+
+function scheduleMascotReturn(delay = 700) {
+  clearTimeout(mascotReturnTimer);
+  mascotReturnTimer = setTimeout(() => {
+    draggableMascot.classList.add("returning");
+    draggableMascot.style.translate = "";
+    setTimeout(() => {
+      draggableMascotImage.src = "assets/sasa-mascot-wave.png";
+      draggableMascot.classList.remove("matched", "returning");
+    }, 650);
+  }, delay);
+}
+
+window.addEventListener("egg-toast-closed", (event) => {
+  if (
+    event.detail.number === 8 &&
+    draggableMascot.classList.contains("matched")
+  ) {
+    scheduleMascotReturn();
+  }
+});
 
 draggableMascot.addEventListener("pointerdown", (event) => {
+  if (draggableMascot.classList.contains("matched")) return;
   event.preventDefault();
-  dragStart = { x: event.clientX, y: event.clientY };
+  dragStart = {
+    x: event.clientX,
+    y: event.clientY,
+    scrollX: window.scrollX,
+    scrollY: window.scrollY,
+  };
+  latestPointer = { x: event.clientX, y: event.clientY };
   mascotMoved = false;
+  draggableMascot.classList.add("dragging");
   draggableMascot.setPointerCapture(event.pointerId);
+  stopMascotAutoScroll();
+  document.documentElement.classList.add("mascot-dragging");
+  mascotScrollFrame = requestAnimationFrame(autoScrollMascotPage);
 });
 draggableMascot.addEventListener("pointermove", (event) => {
   if (!dragStart) return;
-  const x = event.clientX - dragStart.x;
-  const y = event.clientY - dragStart.y;
-  if (Math.hypot(x, y) > 6) mascotMoved = true;
-  if (mascotMoved) draggableMascot.style.translate = `${x}px ${y}px`;
+  latestPointer = { x: event.clientX, y: event.clientY };
+  updateMascotPosition();
 });
 draggableMascot.addEventListener("pointerup", (event) => {
   if (!dragStart) return;
+  stopMascotAutoScroll();
   const dockRect = dock.getBoundingClientRect();
   const mascotRect = draggableMascot.getBoundingClientRect();
   const overlapWidth = Math.max(
@@ -463,22 +621,43 @@ draggableMascot.addEventListener("pointerup", (event) => {
   const overlapRatio =
     (overlapWidth * overlapHeight) / (dockRect.width * dockRect.height);
   if (mascotMoved && overlapRatio >= 0.28) {
-    discoverEgg(8);
-    draggableMascot.classList.add("docked");
+    dragStart = null;
+    latestPointer = null;
+    mascotMoved = false;
+    completeMascotDock();
+    return;
   }
   draggableMascot.style.translate = "";
+  draggableMascot.classList.remove("dragging");
   dragStart = null;
+  latestPointer = null;
   setTimeout(() => {
     mascotMoved = false;
-    draggableMascot.classList.remove("docked");
   }, 1200);
 });
+draggableMascot.addEventListener("pointercancel", () => {
+  stopMascotAutoScroll();
+  draggableMascot.style.translate = "";
+  draggableMascot.classList.remove("dragging");
+  dragStart = null;
+  latestPointer = null;
+  mascotMoved = false;
+});
 draggableMascot.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter") return;
+  if (
+    event.key !== "Enter" ||
+    draggableMascot.classList.contains("matched")
+  )
+    return;
   event.preventDefault();
-  draggableMascot.classList.add("docked");
-  discoverEgg(8);
-  setTimeout(() => draggableMascot.classList.remove("docked"), 1200);
+  const mascotRect = draggableMascot.getBoundingClientRect();
+  const dockRect = dock.getBoundingClientRect();
+  draggableMascot.classList.add("returning");
+  draggableMascot.style.translate = `${dockRect.left + dockRect.width / 2 - (mascotRect.left + mascotRect.width / 2)}px ${dockRect.top + dockRect.height / 2 - (mascotRect.top + mascotRect.height / 2)}px`;
+  setTimeout(() => {
+    draggableMascot.classList.remove("returning");
+    completeMascotDock();
+  }, 650);
 });
 
 // #6 Neuron: hold Minecraft, then break every real booth card.
@@ -491,6 +670,7 @@ let crackStartedAt = 0;
 let crackCompletion = null;
 let miningMode = false;
 let brokenBooths = new Set();
+let miningResetTimer;
 
 function setCrackFrame(cardElement, stage) {
   cardElement.classList.add("cracking");
@@ -502,8 +682,10 @@ function setCrackFrame(cardElement, stage) {
 
 function cancelCracking() {
   cancelAnimationFrame(crackAnimationFrame);
-  const targetIndex = Number(crackTarget?.dataset.open);
-  if (crackTarget && !brokenBooths.has(targetIndex)) {
+  const targetId = crackTarget?.classList.contains("mining-filler")
+    ? "filler"
+    : Number(crackTarget?.dataset.open);
+  if (crackTarget && !brokenBooths.has(targetId)) {
     crackTarget.classList.remove("cracking");
     crackTarget.style.removeProperty("--break-frame");
     delete crackTarget.dataset.cracking;
@@ -553,6 +735,11 @@ function enterMiningMode() {
   brokenBooths.clear();
   document.body.classList.add("mining-mode");
   grid.classList.add("mining-board");
+  const filler = document.createElement("span");
+  filler.className = "mining-filler";
+  filler.dataset.miningFiller = "true";
+  filler.setAttribute("aria-hidden", "true");
+  grid.append(filler);
   const minecraftCard = document.querySelector('.booth-card[data-open="7"]');
   setCrackFrame(minecraftCard, CRACK_FRAME_COUNT);
   minecraftCard.classList.remove("cracking");
@@ -563,13 +750,17 @@ function enterMiningMode() {
 }
 
 document.addEventListener("pointerdown", (event) => {
-  const target = event.target.closest(".booth-card[data-open]");
+  const target = event.target.closest(
+    ".booth-card[data-open], .mining-filler[data-mining-filler]",
+  );
   if (!target) return;
-  const index = Number(target.dataset.open);
+  const targetId = target.classList.contains("mining-filler")
+    ? "filler"
+    : Number(target.dataset.open);
   if (
     currentPlace !== "전체" ||
-    (!miningMode && index !== 7) ||
-    brokenBooths.has(index)
+    (!miningMode && targetId !== 7) ||
+    brokenBooths.has(targetId)
   )
     return;
   startCracking(target, miningMode ? completeBoothBreak : enterMiningMode);
@@ -578,97 +769,145 @@ document.addEventListener("pointerup", cancelCracking);
 document.addEventListener("pointercancel", cancelCracking);
 
 function completeBoothBreak(cardElement) {
-  const index = Number(cardElement.dataset.open);
+  const targetId = cardElement.classList.contains("mining-filler")
+    ? "filler"
+    : Number(cardElement.dataset.open);
   cardElement.classList.remove("cracking");
-  brokenBooths.add(index);
+  brokenBooths.add(targetId);
   removeCardWithParticles(cardElement);
-  if (brokenBooths.size !== booths.length) return;
+  if (brokenBooths.size !== booths.length + 1) return;
   grid.classList.add("image-revealed");
+  miningMode = false;
+  brokenBooths.clear();
+  document.body.classList.remove("mining-mode");
   discoverEgg(6);
+  clearTimeout(miningResetTimer);
+  miningResetTimer = setTimeout(() => {
+    miningResetTimer = null;
+    if (currentPlace === "전체") render("전체");
+  }, 4000);
 }
 
 function removeCardWithParticles(cardElement) {
   const cardRect = cardElement.getBoundingClientRect();
   const gridRect = grid.getBoundingClientRect();
-  const accent = getComputedStyle(cardElement).getPropertyValue("--accent");
-  for (let index = 0; index < 22; index += 1) {
+  const particles = document.createDocumentFragment();
+  for (let index = 0; index < 16; index += 1) {
     const particle = document.createElement("i");
     particle.className = "block-particle";
     particle.setAttribute("aria-hidden", "true");
     particle.style.left = `${cardRect.left - gridRect.left + Math.random() * cardRect.width}px`;
     particle.style.top = `${cardRect.top - gridRect.top + Math.random() * cardRect.height}px`;
-    particle.style.setProperty("--particle-color", accent);
-    particle.style.setProperty("--particle-x", `${Math.random() * 180 - 90}px`);
-    particle.style.setProperty("--particle-y", `${Math.random() * 150 - 110}px`);
-    particle.style.setProperty("--particle-rotation", `${Math.random() * 360}deg`);
-    grid.append(particle);
-    setTimeout(() => particle.remove(), 720);
+    particle.style.setProperty(
+      "--particle-size",
+      `${Math.round(7 + Math.random() * 9)}px`,
+    );
+    particle.style.setProperty("--particle-x", `${Math.random() * 130 - 65}px`);
+    particle.style.setProperty("--particle-y", `${80 + Math.random() * 150}px`);
+    particles.append(particle);
+    setTimeout(() => particle.remove(), 760);
   }
+  grid.append(particles);
   cardElement.classList.add("removed");
 }
 
 function resetMiningState() {
+  clearTimeout(miningResetTimer);
+  miningResetTimer = null;
   cancelCracking();
   miningMode = false;
   brokenBooths.clear();
   document.body.classList.remove("mining-mode");
   grid.classList.remove("mining-board", "image-revealed");
+  grid.querySelector(".mining-filler")?.remove();
 }
 
-// #7 BP: always-solvable 8-puzzle, shuffled with valid moves.
+// #7 BP: always-solvable 5-puzzle, shuffled with valid moves.
 function openPuzzle() {
-  let tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
-  let empty = 8;
-  for (let i = 0; i < 120; i += 1) {
-    const row = Math.floor(empty / 3);
-    const column = empty % 3;
+  const columns = 3;
+  const boardSize = 6;
+  let tiles = [1, 2, 3, 4, 5, 0];
+  let empty = boardSize - 1;
+  for (let i = 0; i < 48; i += 1) {
+    const row = Math.floor(empty / columns);
+    const column = empty % columns;
     const moves = [
-      empty - 3,
-      empty + 3,
+      empty - columns,
+      empty + columns,
       column ? empty - 1 : -1,
-      column < 2 ? empty + 1 : -1,
+      column < columns - 1 ? empty + 1 : -1,
     ].filter(
       (position) =>
         position >= 0 &&
-        position < 9 &&
-        Math.abs(Math.floor(position / 3) - row) +
-          Math.abs((position % 3) - column) ===
+        position < boardSize &&
+        Math.abs(Math.floor(position / columns) - row) +
+          Math.abs((position % columns) - column) ===
           1,
     );
     const next = moves[Math.floor(Math.random() * moves.length)];
     [tiles[empty], tiles[next]] = [tiles[next], tiles[empty]];
     empty = next;
   }
-  if (tiles.every((value, position) => value === (position + 1) % 9)) {
-    [tiles[7], tiles[8]] = [tiles[8], tiles[7]];
-    empty = 7;
+  if (
+    tiles.every((value, position) => value === (position + 1) % boardSize)
+  ) {
+    [tiles[boardSize - 2], tiles[boardSize - 1]] = [
+      tiles[boardSize - 1],
+      tiles[boardSize - 2],
+    ];
+    empty = boardSize - 2;
   }
-  currentPlace = "8-puzzle";
+  currentPlace = "5-puzzle";
   grid.classList.remove("mining-board", "image-revealed");
   grid.classList.add("puzzle-mode");
-  function drawPuzzle() {
+  function drawPuzzle(animate = false) {
+    const previousRects = new Map(
+      [...grid.querySelectorAll("[data-puzzle-tile]")].map((tile) => [
+        tile.dataset.puzzleTile,
+        tile.getBoundingClientRect(),
+      ]),
+    );
     grid.innerHTML = tiles
       .map((tile, index) =>
         tile
-          ? `<button class="puzzle-tile" data-tile-index="${index}"><small>${String(tile).padStart(2, "0")} · ${booths[tile - 1].club}</small><strong>${booths[tile - 1].name}</strong><span>${booths[tile - 1].description}</span></button>`
+          ? `<button class="puzzle-tile" data-tile-index="${index}" data-puzzle-tile="${tile}"><small>${String(tile).padStart(2, "0")} · ${booths[tile - 1].club}</small><strong>${booths[tile - 1].name}</strong><span>${booths[tile - 1].description}</span></button>`
           : '<span class="puzzle-empty" aria-label="빈칸"></span>',
       )
       .join("");
+    if (!animate || !previousRects.size) return;
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    grid.querySelectorAll("[data-puzzle-tile]").forEach((tile) => {
+      const previous = previousRects.get(tile.dataset.puzzleTile);
+      if (!previous) return;
+      const currentRect = tile.getBoundingClientRect();
+      const x = previous.left - currentRect.left;
+      const y = previous.top - currentRect.top;
+      if ((!x && !y) || typeof tile.animate !== "function") return;
+      tile.animate(
+        [{ transform: `translate(${x}px, ${y}px)` }, { transform: "none" }],
+        {
+          duration: reduceMotion ? 1 : 260,
+          easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+        },
+      );
+    });
   }
   grid.onclick = (event) => {
     const tile = event.target.closest(".puzzle-tile");
     if (!tile) return;
     const index = Number(tile.dataset.tileIndex);
     const distance =
-      Math.abs(Math.floor(index / 3) - Math.floor(empty / 3)) +
-      Math.abs((index % 3) - (empty % 3));
+      Math.abs(
+        Math.floor(index / columns) - Math.floor(empty / columns),
+      ) + Math.abs((index % columns) - (empty % columns));
     if (distance !== 1) return;
     [tiles[index], tiles[empty]] = [tiles[empty], tiles[index]];
     empty = index;
-    drawPuzzle();
-    if (tiles.every((value, position) => value === (position + 1) % 9)) {
+    drawPuzzle(true);
+    if (
+      tiles.every((value, position) => value === (position + 1) % boardSize)
+    ) {
       discoverEgg(7);
-      grid.classList.add("puzzle-complete");
     }
   };
   drawPuzzle();
