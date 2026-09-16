@@ -145,7 +145,7 @@ const boothImageFiles = [
   "Life is Easter Egg.png",
   "꿈 우리는 모두 어린왕자였다.png",
   "마인크래프트 속으로.png",
-  "AI 100% 활용하는 법.png",
+  "AI 활용하는 법.png",
   "AI를 설득해보자.png",
   "DUELIST.png",
   "모구모구 정렬.png",
