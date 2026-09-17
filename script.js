@@ -145,7 +145,7 @@ const boothImageFiles = [
   "Life is Easter Egg.png",
   "꿈 우리는 모두 어린왕자였다.png",
   "마인크래프트 속으로.png",
-  "AI 활용하는 법.png",
+  "AI 100% 활용하는 법.png",
   "AI를 설득해보자.png",
   "DUELIST.png",
   "모구모구 정렬.png",
@@ -154,10 +154,9 @@ const boothImageFiles = [
 ];
 
 booths.forEach((booth, index) => {
-  booth.image =
-    index === 7
-      ? null
-      : `assets/부스 이미지/cropped/${boothImageFiles[index]}`;
+  booth.image = encodeURI(
+    `assets/부스 이미지/cropped/${boothImageFiles[index]}`,
+  );
 });
 
 const colors = ["#007f72", "#006ee6", "#7657d6", "#c43ca2"];
@@ -224,6 +223,7 @@ function render(place = "전체") {
     "mining-board",
     "image-revealed",
   );
+  grid.classList.toggle("all-filter", place === "전체");
   grid.onclick = null;
   const cards = booths
     .filter((b) => place === "전체" || b.place === place)
@@ -232,7 +232,8 @@ function render(place = "전체") {
 }
 function openBooth(index) {
   const b = booths[index];
-  const poster = b.image
+  const showPoster = !(index === 7 && currentPlace === "전체");
+  const poster = showPoster
     ? `<figure class="dialog-poster"><img src="${b.image}" alt="${b.name} 부스 이미지" decoding="async" /></figure>`
     : `<figure class="dialog-poster dialog-poster-empty" aria-label="${b.name} 이스터에그 힌트"><div class="minecraft-detail-hint"><small>그림이 어디갔지?</small><strong>이 카드 뒤에 숨어있는 것 같은데?</strong></div></figure>`;
   document.querySelector("#dialog-content").innerHTML =
@@ -858,7 +859,7 @@ function openPuzzle() {
     empty = boardSize - 2;
   }
   currentPlace = "5-puzzle";
-  grid.classList.remove("mining-board", "image-revealed");
+  grid.classList.remove("all-filter", "mining-board", "image-revealed");
   grid.classList.add("puzzle-mode");
   function drawPuzzle(animate = false) {
     const previousRects = new Map(

@@ -357,14 +357,20 @@ button {
   flex-direction: column;
   transition: 0.3s;
 }
-.booth-card:not([data-open="7"]):hover {
+.booth-card:hover {
   background: color-mix(in srgb, var(--accent) 16%, var(--surface));
   transform: translateY(-5px);
   box-shadow: 0 12px 40px color-mix(in srgb, var(--accent) 14%, transparent);
   border-color: var(--accent);
 }
-.booth-card[data-open="7"] {
+.booth-grid.all-filter .booth-card[data-open="7"] {
   cursor: crosshair;
+}
+.booth-grid.all-filter .booth-card[data-open="7"]:hover {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+  transform: none;
 }
 .booth-card > span {
   font-size: 15px;
