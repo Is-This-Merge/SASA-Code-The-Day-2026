@@ -532,6 +532,7 @@ let latestPointer = null;
 let mascotMoved = false;
 let mascotReturnTimer;
 let mascotScrollFrame;
+let mascotScrollLimit = 0;
 
 function stopMascotAutoScroll() {
   cancelAnimationFrame(mascotScrollFrame);
@@ -551,7 +552,12 @@ function updateMascotPosition() {
 
 function autoScrollMascotPage() {
   if (!dragStart || !latestPointer) return;
+  if (!mascotMoved) {
+    mascotScrollFrame = requestAnimationFrame(autoScrollMascotPage);
+    return;
+  }
   const edge = Math.min(110, window.innerHeight * 0.16);
+  const maxScroll = mascotScrollLimit;
   let scrollAmount = 0;
   if (latestPointer.y < edge) {
     const intensity = (edge - latestPointer.y) / edge;
@@ -561,6 +567,12 @@ function autoScrollMascotPage() {
       (latestPointer.y - (window.innerHeight - edge)) / edge;
     scrollAmount = Math.ceil(16 * intensity * intensity);
   }
+  if (
+    (scrollAmount < 0 && window.scrollY <= 0) ||
+    (scrollAmount > 0 && window.scrollY >= maxScroll - 1)
+  ) {
+    scrollAmount = 0;
+  }
   if (scrollAmount) {
     window.scrollBy(0, scrollAmount);
     updateMascotPosition();
@@ -568,8 +580,25 @@ function autoScrollMascotPage() {
   mascotScrollFrame = requestAnimationFrame(autoScrollMascotPage);
 }
 
+function resetMascotDrag() {
+  const scrollLimit = mascotScrollLimit;
+  stopMascotAutoScroll();
+  draggableMascot.style.translate = "";
+  draggableMascot.classList.remove("dragging");
+  draggableMascotImage.src = draggableMascotAssets.idle;
+  draggableMascotImage.alt =
+    "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
+  leftBehindLaptop.classList.remove("visible");
+  dragStart = null;
+  latestPointer = null;
+  mascotMoved = false;
+  mascotScrollLimit = 0;
+  if (window.scrollY > scrollLimit) window.scrollTo(0, scrollLimit);
+}
+
 function completeMascotDock() {
   stopMascotAutoScroll();
+  mascotScrollLimit = 0;
   draggableMascot.classList.remove("dragging");
   clearTimeout(mascotReturnTimer);
   draggableMascotImage.src = draggableMascotAssets.matched;
@@ -606,6 +635,10 @@ window.addEventListener("egg-toast-closed", (event) => {
 draggableMascot.addEventListener("pointerdown", (event) => {
   if (draggableMascot.classList.contains("matched")) return;
   event.preventDefault();
+  mascotScrollLimit = Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
   dragStart = {
     x: event.clientX,
     y: event.clientY,
@@ -652,29 +685,25 @@ draggableMascot.addEventListener("pointerup", (event) => {
     completeMascotDock();
     return;
   }
-  draggableMascot.style.translate = "";
-  draggableMascot.classList.remove("dragging");
-  draggableMascotImage.src = draggableMascotAssets.idle;
-  draggableMascotImage.alt =
-    "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
-  leftBehindLaptop.classList.remove("visible");
-  dragStart = null;
-  latestPointer = null;
+  resetMascotDrag();
   setTimeout(() => {
     mascotMoved = false;
   }, 1200);
 });
 draggableMascot.addEventListener("pointercancel", () => {
-  stopMascotAutoScroll();
-  draggableMascot.style.translate = "";
-  draggableMascot.classList.remove("dragging");
-  draggableMascotImage.src = draggableMascotAssets.idle;
-  draggableMascotImage.alt =
-    "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
-  leftBehindLaptop.classList.remove("visible");
-  dragStart = null;
-  latestPointer = null;
-  mascotMoved = false;
+  resetMascotDrag();
+});
+window.addEventListener("pointerup", () => {
+  if (dragStart) resetMascotDrag();
+});
+window.addEventListener("pointercancel", () => {
+  if (dragStart) resetMascotDrag();
+});
+window.addEventListener("blur", () => {
+  if (dragStart) resetMascotDrag();
+});
+draggableMascot.addEventListener("lostpointercapture", () => {
+  if (dragStart) resetMascotDrag();
 });
 draggableMascot.addEventListener("keydown", (event) => {
   if (
