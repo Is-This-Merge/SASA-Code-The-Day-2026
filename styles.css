@@ -72,7 +72,7 @@ button {
 }
 .status-qr-frame.hero-qr {
   position: absolute;
-  top: calc(100% + 48px);
+  top: calc(100% + 70px);
   left: 0;
   width: 310px;
   display: grid;
@@ -119,7 +119,7 @@ button {
   animation: pulse 2s infinite;
 }
 .hero h1 {
-  margin: 0 0 9px;
+  margin: 0 0 17px;
   font-size: clamp(36px, 4.3vw, 66px);
   line-height: 1;
   letter-spacing: -0.055em;
@@ -132,7 +132,7 @@ button {
 }
 .hero h1 span {
   margin: 0 0 0.42em;
-  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-family: "Space Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 0.42em;
   font-style: italic;
   font-weight: 400;
@@ -148,7 +148,7 @@ button {
 }
 .lead {
   display: block;
-  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-family: "Space Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 17px;
   line-height: 1.7;
   color: #52677d;
@@ -157,18 +157,9 @@ button {
   height: min(68vh, 610px);
   min-height: 500px;
 }
-.carousel-head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 15px;
-  letter-spacing: 0.15em;
-  font-weight: 700;
-  color: var(--orange);
-}
 .slides {
   position: relative;
-  height: calc(100% - 62px);
+  height: calc(100% - 50px);
 }
 .slide {
   --accent: #007f72;
@@ -1244,8 +1235,18 @@ body.toast-open::before {
   word-break: keep-all;
 }
 .booth-grid.puzzle-mode > .puzzle-empty {
+  display: grid;
+  place-items: center;
   background:
     linear-gradient(135deg, rgba(0, 127, 114, 0.04), rgba(0, 110, 230, 0.025));
+}
+.puzzle-empty b {
+  color: var(--orange);
+  font-family: "Space Mono", "Cascadia Mono", Consolas, monospace;
+  font-size: clamp(72px, 9vw, 132px);
+  line-height: 1;
+  letter-spacing: -0.08em;
+  opacity: 0.2;
 }
 @media (max-width: 900px) {
   .hero {
@@ -1305,7 +1306,7 @@ body.toast-open::before {
   .carousel {
     height: 410px;
     min-height: 0;
-    margin-top: 190px;
+    margin-top: 212px;
   }
   .slide {
     padding: 25px;
@@ -1359,6 +1360,9 @@ body.toast-open::before {
   .puzzle-tile span {
     display: none;
   }
+  .puzzle-empty b {
+    font-size: clamp(42px, 14vw, 72px);
+  }
   .booth-card {
     min-height: 260px;
   }
@@ -1366,7 +1370,7 @@ body.toast-open::before {
     min-height: 260px;
   }
   .status-qr-frame.hero-qr {
-    top: calc(100% + 38px);
+    top: calc(100% + 58px);
     width: min(286px, calc(100vw - 40px));
     grid-template-columns: 82px minmax(0, 1fr);
   }

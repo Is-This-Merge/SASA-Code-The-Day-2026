@@ -182,11 +182,12 @@ const metaIcons = {
 let currentPlace = "전체";
 let current = 0,
   timer;
+let puzzleReturnTimer;
 
 slides.innerHTML = carouselItems
   .map(
     (b, i) =>
-      `<article class="slide${i === 0 ? " active" : ""}${b.index === 5 ? " easter-egg-slide" : ""}" ${b.index === 5 ? "data-anomaly" : ""} style="--accent:${colors[i % 4]}"><div class="slide-number">${String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2${b.index === 5 ? ` data-glitch="${b.name}"` : ""}>${b.name}</h2><p>${b.index === 5 ? "이 카드 자체가 이스터에그입니다. 클릭해 첫 번째 신호를 확인해보세요." : b.description}</p><div class="slide-meta"><span class="meta-badge">${metaIcons.place}<span>${b.place}</span></span><span class="meta-badge">${metaIcons.time}<span>${b.time}</span></span><span class="meta-badge">${metaIcons.age}<span>${b.age}</span></span></div></article>`,
+      `<article class="slide${i === 0 ? " active" : ""}${b.index === 5 ? " easter-egg-slide" : ""}" ${b.index === 5 ? "data-anomaly" : ""} style="--accent:${colors[i % 4]}"><div class="slide-number">${String(i + 1).padStart(2, "0")}</div><div class="slide-club">${b.club}</div><h2${b.index === 5 ? ` data-glitch="${b.name}"` : ""}>${b.name}</h2><p>${b.index === 5 ? "이 카드 자체가 이스터에그입니다. 클릭해 첫 번째 이스터에그를 획득해보세요." : b.description}</p><div class="slide-meta"><span class="meta-badge">${metaIcons.place}<span>${b.place}</span></span><span class="meta-badge">${metaIcons.time}<span>${b.time}</span></span><span class="meta-badge">${metaIcons.age}<span>${b.age}</span></span></div></article>`,
   )
   .join("");
 
@@ -195,11 +196,7 @@ function showSlide(next) {
   document
     .querySelectorAll(".slide")
     .forEach((el, i) => el.classList.toggle("active", i === current));
-  const slideCount = document.querySelector("#slide-count");
-  if (slideCount) {
-    slideCount.textContent =
-      `${String(current + 1).padStart(2, "0")} / ${carouselItems.length}`;
-  }
+
   const bar = document.querySelector("#progress");
   if (!bar) return;
   bar.style.animation = "none";
@@ -262,6 +259,8 @@ document.addEventListener("click", (e) => {
 document.querySelector("#filters").onclick = (e) => {
   const button = e.target.closest("button");
   if (!button) return;
+  clearTimeout(puzzleReturnTimer);
+  puzzleReturnTimer = null;
   if (button.dataset.place === "5-puzzle") {
     resetMiningState();
     document
@@ -862,6 +861,8 @@ function resetMiningState() {
 
 // #7 BP: always-solvable 5-puzzle, shuffled with valid moves.
 function openPuzzle() {
+  clearTimeout(puzzleReturnTimer);
+  puzzleReturnTimer = null;
   const columns = 3;
   const boardSize = 6;
   let tiles = [1, 2, 3, 4, 5, 0];
@@ -909,7 +910,7 @@ function openPuzzle() {
       .map((tile, index) =>
         tile
           ? `<button class="puzzle-tile" data-tile-index="${index}" data-puzzle-tile="${tile}"><small>${String(tile).padStart(2, "0")} · ${booths[tile - 1].club}</small><strong>${booths[tile - 1].name}</strong><span>${booths[tile - 1].description}</span></button>`
-          : '<span class="puzzle-empty" aria-label="빈칸"></span>',
+          : `<span class="puzzle-empty" aria-label="${index < boardSize - 1 ? `${index + 1}번 카드 자리` : "완성 위치"}"><b>${index < boardSize - 1 ? String(index + 1).padStart(2, "0") : "—"}</b></span>`,
       )
       .join("");
     if (!animate || !previousRects.size) return;
@@ -945,7 +946,17 @@ function openPuzzle() {
     if (
       tiles.every((value, position) => value === (position + 1) % boardSize)
     ) {
+      grid.onclick = null;
       discoverEgg(7);
+      puzzleReturnTimer = setTimeout(() => {
+        puzzleReturnTimer = null;
+        document
+          .querySelectorAll("#filters button")
+          .forEach((button) =>
+            button.classList.toggle(button.dataset.place === "전체"),
+          );
+        render("전체");
+      }, 3000);
     }
   };
   drawPuzzle();
