@@ -164,6 +164,13 @@ const carouselItems = booths;
 const slides = document.querySelector("#slides");
 const grid = document.querySelector("#booth-grid");
 const dialog = document.querySelector("#booth-dialog");
+const dockCell = document.createElement("div");
+const dock = document.createElement("div");
+dockCell.className = "mascot-dock-cell";
+dockCell.setAttribute("aria-hidden", "true");
+dock.className = "mascot-dock";
+dock.id = "mascot-dock";
+dockCell.append(dock);
 const metaIcons = {
   place:
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
@@ -188,9 +195,13 @@ function showSlide(next) {
   document
     .querySelectorAll(".slide")
     .forEach((el, i) => el.classList.toggle("active", i === current));
-  document.querySelector("#slide-count").textContent =
-    `${String(current + 1).padStart(2, "0")} / ${carouselItems.length}`;
+  const slideCount = document.querySelector("#slide-count");
+  if (slideCount) {
+    slideCount.textContent =
+      `${String(current + 1).padStart(2, "0")} / ${carouselItems.length}`;
+  }
   const bar = document.querySelector("#progress");
+  if (!bar) return;
   bar.style.animation = "none";
   bar.style.animationPlayState = "running";
   bar.offsetHeight;
@@ -202,7 +213,8 @@ function autoplay() {
 }
 function pauseAutoplay() {
   clearInterval(timer);
-  document.querySelector("#progress").style.animationPlayState = "paused";
+  const bar = document.querySelector("#progress");
+  if (bar) bar.style.animationPlayState = "paused";
 }
 document.querySelector("#prev").onclick = () => {
   showSlide(current - 1);
@@ -229,6 +241,7 @@ function render(place = "전체") {
     .filter((b) => place === "전체" || b.place === place)
     .map(card);
   grid.innerHTML = cards.join("");
+  if (place === "전체") grid.append(dockCell);
 }
 function openBooth(index) {
   const b = booths[index];
@@ -509,7 +522,12 @@ mascot.addEventListener("click", () => {
 // #8 BP: move the lost mascot into its dock.
 const draggableMascot = document.querySelector(".draggable-mascot");
 const draggableMascotImage = draggableMascot.querySelector("img");
-const dock = document.querySelector("#mascot-dock");
+const leftBehindLaptop = document.querySelector(".left-behind-laptop");
+const draggableMascotAssets = {
+  idle: "assets/sasa-mascot-coding-back.png",
+  dragging: "assets/sasa-mascot-flying.png",
+  matched: "assets/sasa-mascot-wave.png",
+};
 let dragStart = null;
 let latestPointer = null;
 let mascotMoved = false;
@@ -555,7 +573,8 @@ function completeMascotDock() {
   stopMascotAutoScroll();
   draggableMascot.classList.remove("dragging");
   clearTimeout(mascotReturnTimer);
-  draggableMascotImage.src = "assets/sasa-mascot-tickled.png";
+  draggableMascotImage.src = draggableMascotAssets.matched;
+  draggableMascotImage.alt = "손을 흔드는 SASA 마스코트 구름이";
   draggableMascot.classList.add("matched");
   const popupShown = discoverEgg(8);
   if (!popupShown) scheduleMascotReturn(900);
@@ -567,7 +586,10 @@ function scheduleMascotReturn(delay = 700) {
     draggableMascot.classList.add("returning");
     draggableMascot.style.translate = "";
     setTimeout(() => {
-      draggableMascotImage.src = "assets/sasa-mascot-wave.png";
+      draggableMascotImage.src = draggableMascotAssets.idle;
+      draggableMascotImage.alt =
+        "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
+      leftBehindLaptop.classList.remove("visible");
       draggableMascot.classList.remove("matched", "returning");
     }, 650);
   }, delay);
@@ -593,6 +615,9 @@ draggableMascot.addEventListener("pointerdown", (event) => {
   };
   latestPointer = { x: event.clientX, y: event.clientY };
   mascotMoved = false;
+  draggableMascotImage.src = draggableMascotAssets.dragging;
+  draggableMascotImage.alt = "팔다리를 뒤로 뻗고 날아가는 SASA 마스코트 구름이";
+  leftBehindLaptop.classList.add("visible");
   draggableMascot.classList.add("dragging");
   draggableMascot.setPointerCapture(event.pointerId);
   stopMascotAutoScroll();
@@ -630,6 +655,10 @@ draggableMascot.addEventListener("pointerup", (event) => {
   }
   draggableMascot.style.translate = "";
   draggableMascot.classList.remove("dragging");
+  draggableMascotImage.src = draggableMascotAssets.idle;
+  draggableMascotImage.alt =
+    "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
+  leftBehindLaptop.classList.remove("visible");
   dragStart = null;
   latestPointer = null;
   setTimeout(() => {
@@ -640,6 +669,10 @@ draggableMascot.addEventListener("pointercancel", () => {
   stopMascotAutoScroll();
   draggableMascot.style.translate = "";
   draggableMascot.classList.remove("dragging");
+  draggableMascotImage.src = draggableMascotAssets.idle;
+  draggableMascotImage.alt =
+    "노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습";
+  leftBehindLaptop.classList.remove("visible");
   dragStart = null;
   latestPointer = null;
   mascotMoved = false;
@@ -653,6 +686,9 @@ draggableMascot.addEventListener("keydown", (event) => {
   event.preventDefault();
   const mascotRect = draggableMascot.getBoundingClientRect();
   const dockRect = dock.getBoundingClientRect();
+  draggableMascotImage.src = draggableMascotAssets.dragging;
+  draggableMascotImage.alt = "팔다리를 뒤로 뻗고 날아가는 SASA 마스코트 구름이";
+  leftBehindLaptop.classList.add("visible");
   draggableMascot.classList.add("returning");
   draggableMascot.style.translate = `${dockRect.left + dockRect.width / 2 - (mascotRect.left + mascotRect.width / 2)}px ${dockRect.top + dockRect.height / 2 - (mascotRect.top + mascotRect.height / 2)}px`;
   setTimeout(() => {
@@ -736,6 +772,7 @@ function enterMiningMode() {
   brokenBooths.clear();
   document.body.classList.add("mining-mode");
   grid.classList.add("mining-board");
+  dockCell.remove();
   const filler = document.createElement("span");
   filler.className = "mining-filler";
   filler.dataset.miningFiller = "true";

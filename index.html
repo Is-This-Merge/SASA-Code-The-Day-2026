@@ -19,10 +19,29 @@
         <div class="grid-bg" aria-hidden="true"></div>
         <div class="scan-line" aria-hidden="true"></div>
         <div class="hero-copy">
-          <h1>
-            <span>Welcome to</span><em>C.O.D.E. The Day!</em>
-          </h1>
-          <i class="lead">- Creating Our Digital Era -</i>
+          <div class="hero-title">
+            <h1>
+              <span>Welcome to</span><em>C.O.D.E. The Day!</em>
+            </h1>
+            <i class="lead">- Creating Our Digital Era -</i>
+          </div>
+          <a
+            class="status-qr-frame hero-qr"
+            href="https://script.google.com/macros/s/AKfycbwcv3N1f_JTtlOTJz2liA9klTKtQGgFfuMFsWpec19HRhptp2bCkN7bPzYsqWGUjdb5/exec"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="새 창에서 실시간 부스 현황 조회"
+          >
+            <img
+              src="assets/qr.svg"
+              alt="부스 현황 조회 사이트 QR 코드"
+              class="status-qr"
+            />
+            <span class="hero-qr-copy">
+              <strong>실시간 부스 현황</strong>
+              <small>QR을 스캔해 대기 인원과 운영 상태를 확인하세요.</small>
+            </span>
+          </a>
         </div>
 
         <figure
@@ -38,7 +57,7 @@
 
         <div class="carousel" aria-label="추천 부스">
           <div class="carousel-head">
-            <span>Where to Go?</span><span id="slide-count">01 / 14</span>
+            <span>어디로 갈까?</span><span id="slide-count">01 / 14</span>
           </div>
           <div class="slides" id="slides"></div>
           <div class="carousel-controls">
@@ -66,32 +85,12 @@
           ><button data-place="5-puzzle">5-puzzle</button>
         </div>
         <div class="booth-grid" id="booth-grid"></div>
-
-        <aside class="booth-status" id="booth-status">
-          <div class="status-copy">
-            <small>LIVE BOOTH STATUS</small>
-            <h3>실시간 부스 현황</h3>
-            <p>대기 인원과 운영 상태를 확인할 수 있는 사이트입니다.</p>
-            <a href="https://script.google.com/macros/s/AKfycbwcv3N1f_JTtlOTJz2liA9klTKtQGgFfuMFsWpec19HRhptp2bCkN7bPzYsqWGUjdb5/exec">부스 현황 조회 사이트로 이동 →</a>
-          </div>
-          <div class="mascot-dock" id="mascot-dock" aria-hidden="true"></div>
-          <div
-            class="status-qr-frame"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="새 창에서 실시간 부스 현황 조회"
-          >
-            <img
-              src="assets/qr.svg"
-              alt="부스 현황 조회 사이트 QR 코드"
-              class="status-qr"
-            />
-            <small>SCAN FOR LIVE STATUS</small>
-          </a>
-        </aside>
       </section>
 
       <section class="guide" id="guide" aria-label="행사 운영 정보">
+        <header class="guide-title">
+          <h2>행사 운영 정보</h2>
+        </header>
         <div class="guide-grid">
           <article>
             <small>재학생</small><strong>16:20 — 18:10</strong>
@@ -117,7 +116,7 @@
     <section class="mascot-playground" aria-label="구름이 휴게 공간">
       <p class="egg-count">
         웹사이트 곳곳에 숨겨진 8가지 이스터에그를 찾아 순서대로 나열해 하나의 문장으로 완성해보세요!<br>
-        리플렛에 문구를 적어 안내 부스로 가면 찾은 이스터에그 개수에 따라 선물을 받을 수 있습니다.
+        리플렛에 문구를 적어 입구쪽 안내 부스로 가면 보상이 기다리고 있습니다.
       </p>
       <figure
         class="draggable-mascot"
@@ -126,11 +125,17 @@
         aria-label="움직일 수 있는 SASA 마스코트 구름이"
       >
         <img
-          src="assets/sasa-mascot-wave.png"
-          alt="손을 흔드는 SASA 마스코트 구름이"
+          src="assets/sasa-mascot-coding-back.png"
+          alt="노트북으로 코딩하고 있는 SASA 마스코트 구름이의 뒷모습"
           draggable="false"
         />
       </figure>
+      <img
+        class="left-behind-laptop"
+        src="assets/sasa-laptop-left-behind.png"
+        alt=""
+        aria-hidden="true"
+      />
     </section>
 
     <footer>
@@ -157,7 +162,7 @@
             aria-label="Day 또는 데이의 세 번째 부분 입력"
         /></label>
       </div>
-      <small class="copyright">© 2026 SASA. All rights reserved.</small>
+      <small class="copyright">© 2026 NULL&s0sCoD3. All rights reserved.</small>
       <small>2026. 09. 18.</small>
     </footer>
 

@@ -49,6 +49,7 @@ button {
 .grid-bg {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background-image:
     linear-gradient(var(--line) 1px, transparent 1px),
     linear-gradient(90deg, var(--line) 1px, transparent 1px);
@@ -65,6 +66,41 @@ button {
   z-index: 3;
   font-family: "Noto Sans KR", "Malgun Gothic", "DM Sans", sans-serif;
   translate: 0 -30%;
+}
+.hero-title {
+  translate: 0 -38px;
+}
+.status-qr-frame.hero-qr {
+  position: absolute;
+  top: calc(100% + 48px);
+  left: 0;
+  width: 310px;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+.hero-qr .status-qr {
+  width: 96px;
+  padding: 8px;
+}
+.hero-qr-copy strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.status-qr-frame .hero-qr-copy small {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
 }
 .eyebrow {
   display: flex;
@@ -83,7 +119,7 @@ button {
   animation: pulse 2s infinite;
 }
 .hero h1 {
-  margin: 30px 0 25px;
+  margin: 0 0 9px;
   font-size: clamp(36px, 4.3vw, 66px);
   line-height: 1;
   letter-spacing: -0.055em;
@@ -96,7 +132,7 @@ button {
 }
 .hero h1 span {
   margin: 0 0 0.42em;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
   font-size: 0.42em;
   font-style: italic;
   font-weight: 400;
@@ -111,6 +147,8 @@ button {
   color: var(--orange);
 }
 .lead {
+  display: block;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
   font-size: 17px;
   line-height: 1.7;
   color: #52677d;
@@ -399,49 +437,6 @@ button {
 .booth-card small {
   font-size: 15px;
 }
-.booth-status {
-  margin-top: 42px;
-  padding: clamp(24px, 3vw, 38px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 128px auto;
-  align-items: center;
-  gap: clamp(28px, 5vw, 72px);
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(circle at 88% 20%, rgba(0, 110, 230, 0.09), transparent 28%),
-    var(--surface);
-}
-.status-copy small {
-  color: var(--orange);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-}
-.status-copy h3 {
-  margin: 14px 0 9px;
-  font-size: clamp(25px, 2.2vw, 34px);
-  letter-spacing: -0.045em;
-}
-.status-copy p {
-  margin: 0 0 22px;
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1.65;
-}
-.status-copy a {
-  display: inline-flex;
-  padding-bottom: 4px;
-  border-bottom: 1px solid currentColor;
-  color: var(--orange);
-  font-size: 16px;
-  font-weight: 700;
-  text-decoration: none;
-}
-.status-copy a[aria-disabled="true"] {
-  cursor: default;
-  opacity: 0.68;
-  pointer-events: none;
-}
 .status-qr-frame {
   width: 184px;
   padding: 12px 12px 10px;
@@ -482,8 +477,26 @@ button {
 .guide {
   max-width: 1480px;
   margin: auto;
-  padding: 0 6vw 115px;
+  padding: 54px 6vw 115px;
+  border-top: 1px solid var(--line);
   color: var(--ink);
+}
+.guide-title {
+  margin-bottom: 34px;
+}
+.guide-title small {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--orange);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+.guide-title h2 {
+  margin: 0;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.055em;
 }
 .guide-grid {
   display: grid;
@@ -771,6 +784,7 @@ dd {
   font-size: 15px;
   letter-spacing: 0.35em;
   white-space: nowrap;
+  pointer-events: none;
 }
 @keyframes scan {
   to {
@@ -997,6 +1011,7 @@ body.toast-open::before {
   background: rgba(19, 35, 51, 0.32);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
 }
 .toast-message {
   display: block;
@@ -1103,7 +1118,9 @@ body.toast-open::before {
   touch-action: none;
   user-select: none;
   filter: drop-shadow(0 18px 22px rgba(30, 62, 82, 0.14));
-  transition: filter 0.2s;
+  transition:
+    width 0.2s ease,
+    filter 0.2s;
 }
 .draggable-mascot:active {
   cursor: grabbing;
@@ -1111,6 +1128,7 @@ body.toast-open::before {
 }
 .draggable-mascot.dragging {
   z-index: 130;
+  width: 140px;
   filter: drop-shadow(0 26px 38px rgba(0, 127, 114, 0.28));
 }
 .draggable-mascot img {
@@ -1118,10 +1136,32 @@ body.toast-open::before {
   width: 100%;
   pointer-events: none;
 }
+.left-behind-laptop {
+  position: absolute;
+  z-index: 1;
+  left: calc(4vw + 48px);
+  bottom: -2px;
+  width: 104px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px) rotate(-5deg) scale(0.78);
+  transform-origin: center bottom;
+  filter: drop-shadow(0 12px 16px rgba(30, 62, 82, 0.18));
+  transition:
+    opacity 0.16s ease,
+    transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.left-behind-laptop.visible {
+  opacity: 1;
+  transform: rotate(-5deg) scale(1);
+}
 .draggable-mascot.returning {
   transition:
     translate 0.65s cubic-bezier(0.2, 0.8, 0.2, 1),
     filter 0.2s;
+}
+.draggable-mascot.returning:not(.matched) {
+  width: 140px;
 }
 .draggable-mascot.matched {
   cursor: default;
@@ -1130,12 +1170,20 @@ body.toast-open::before {
 }
 .mascot-dock {
   position: relative;
-  width: 118px;
+  width: 138px;
   aspect-ratio: 0.78;
   justify-self: center;
-  background: url("assets/sasa-mascot-wave.png") center / contain no-repeat;
+  background: url("assets/sasa-mascot-flying.png") center / contain no-repeat;
   filter: grayscale(1) contrast(0.35);
   opacity: 0.16;
+}
+.mascot-dock-cell {
+  min-height: 310px;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.4);
 }
 @keyframes mascot-match {
   to {
@@ -1230,15 +1278,26 @@ body.toast-open::before {
     bottom: -18px;
     width: 92px;
   }
+  .draggable-mascot.dragging,
+  .draggable-mascot.returning:not(.matched) {
+    width: 112px;
+  }
+  .left-behind-laptop {
+    left: 56px;
+    bottom: -4px;
+    width: 82px;
+  }
   .mascot-dock {
-    width: 92px;
+    width: 110px;
   }
   .hero-mascot figcaption {
     display: none;
   }
   .hero h1 {
     font-size: clamp(28px, 8.4vw, 44px);
-    translate: 0 -20px;
+  }
+  .hero-title {
+    translate: 0 -44px;
   }
   .lead br {
     display: none;
@@ -1246,7 +1305,7 @@ body.toast-open::before {
   .carousel {
     height: 410px;
     min-height: 0;
-    margin-top: 45px;
+    margin-top: 190px;
   }
   .slide {
     padding: 25px;
@@ -1303,19 +1362,26 @@ body.toast-open::before {
   .booth-card {
     min-height: 260px;
   }
-  .booth-status {
-    margin-top: 28px;
-    grid-template-columns: minmax(90px, 0.7fr) auto;
+  .mascot-dock-cell {
+    min-height: 260px;
   }
-  .status-copy {
-    grid-column: 1 / -1;
+  .status-qr-frame.hero-qr {
+    top: calc(100% + 38px);
+    width: min(286px, calc(100vw - 40px));
+    grid-template-columns: 82px minmax(0, 1fr);
   }
-  .status-qr-frame {
-    width: min(184px, 58vw);
+  .hero-qr .status-qr {
+    width: 82px;
   }
   .guide {
     margin: 0;
-    padding: 0 20px 85px;
+    padding: 42px 20px 85px;
+  }
+  .guide-title {
+    margin-bottom: 26px;
+  }
+  .guide-title h2 {
+    font-size: 30px;
   }
   .guide-grid {
     grid-template-columns: 1fr;
